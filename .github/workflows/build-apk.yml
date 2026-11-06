@@ -2,7 +2,9 @@ name: Build GiziGym APK
 on:
   push:
     branches: [main]
+    paths-ignore: ['**.md']
   pull_request:
+    paths-ignore: ['**.md']
   workflow_dispatch:
 permissions:
   contents: write

@@ -28,7 +28,7 @@ Status: `[x]` selesai, `[ ]` belum
 
 Prioritas tertinggi: yang menentukan aplikasinya tetap dipakai atau ditinggal.
 
-- [ ] Backup ke file + backup otomatis harian (simpan `.json` ke HP, kirim ke WhatsApp/Drive, pulihkan dari file). Sekarang semua data cuma ada di HP, jadi reset/uninstall/ganti HP berarti catatan hilang.
+- [x] Backup ke file + backup otomatis harian: tiap hari ke `Documents/GiziGym` (7 hari terakhir disimpan), tombol kirim ke WhatsApp/Drive, pulihkan dari file dengan konfirmasi.
 - [ ] Menu favorit dan "salin dari kemarin": simpan kombinasi seperti "sarapan biasa", tambah sekali tap. Waktu mencatat turun dari ±1 menit jadi beberapa detik.
 - [ ] Edit item yang sudah dicatat (ganti porsi/nama tanpa hapus–tambah ulang), terutama untuk membetulkan hasil foto AI.
 - [ ] Isi profil di awal: saat pertama buka, tanya gender, umur, berat/tinggi, dan tujuan, supaya target dan program gym langsung sesuai (tidak lagi pakai profil contoh).
