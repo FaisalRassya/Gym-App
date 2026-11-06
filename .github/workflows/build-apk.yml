@@ -31,7 +31,23 @@ jobs:
             echo "::error::Secret KEYSTORE_BASE64 belum diisi. Buka Settings > Secrets and variables > Actions, isi KEYSTORE_BASE64 dan KEYSTORE_PASSWORD, lalu jalankan ulang workflow ini."
             exit 1
           fi
-          echo "$KEYSTORE_BASE64" | base64 -d > android/app/gizigym-release.jks
+          # Buang spasi/enter yang sering ikut waktu copy-paste
+          CLEAN=$(printf "%s" "$KEYSTORE_BASE64" | tr -d ' \r\n\t"')
+          echo "Panjang KEYSTORE_BASE64 setelah dibersihkan: ${#CLEAN} karakter (seharusnya 5712)"
+          if ! printf "%s" "$CLEAN" | base64 -d > android/app/gizigym-release.jks 2>/dev/null; then
+            echo "::error::KEYSTORE_BASE64 bukan base64 yang utuh (panjang ${#CLEAN}, seharusnya 5712). Kemungkinan kepotong atau ada karakter lain ikut tersalin. Hapus secret-nya lalu tempel ulang dari awal sampai akhir."
+            exit 1
+          fi
+      - name: Cek password cocok dengan kunci
+        if: github.event_name != 'pull_request'
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          if ! keytool -list -keystore android/app/gizigym-release.jks -storepass "$KEYSTORE_PASSWORD" -alias gizigym >/dev/null 2>&1; then
+            echo "::error::Kunci terbaca, tapi KEYSTORE_PASSWORD tidak cocok (atau kuncinya rusak). Cek ulang secret KEYSTORE_PASSWORD tanpa spasi di awal/akhir."
+            exit 1
+          fi
+          echo "Kunci & password cocok."
       - name: Build APK
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
