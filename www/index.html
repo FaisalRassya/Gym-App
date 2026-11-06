@@ -529,10 +529,12 @@ function openProfile(){
     $("#sx",sh).onclick=e=>{const b=e.target.closest("button");if(!b)return;sex=b.dataset.v;sh.querySelectorAll("#sx button").forEach(x=>x.classList.toggle("on",x===b))};
     $("#psave",sh).onclick=()=>{const a=+$("#pa",sh).value,w=+$("#pw",sh).value,h=+$("#ph",sh).value;
       if(!(a>=13&&a<=90&&w>=30&&w<=250&&h>=120&&h<=230)){toast("Cek lagi umur/berat/tinggi");return}
-      const oldW=S.profile.w;
-      S.profile={sex,age:a,w,h,act:+$("#pact",sh).value};S.water=Math.max(1,Math.min(16,+$("#pwt",sh).value||8));
+      const oldW=S.profile.w,oldSex=S.profile.sex;
+      S.profile={sex,age:a,w,h,act:+$("#pact",sh).value};
+      const curP=PROGRAMS.find(x=>x.id===S.gym.prog);let switched="";
+      if(!S.active&&curP&&curP.g&&curP.g!=="all"&&curP.g!==sex){const np=PROGRAMS.find(x=>x.id===PDEF[sex]);S.gym={prog:np.id,next:0};switched=np.name}S.water=Math.max(1,Math.min(16,+$("#pwt",sh).value||8));
       if(w!==oldW||!S.weights.length){logWeight(w)}
-      save();close();render();toast("Profil disimpan")};
+      save();close();render();toast(switched?`Profil disimpan. Program diganti ke "${switched}" (${GLABEL[sex]}).`:"Profil disimpan")};
   });
 }
 function logWeight(kg){const k=dkey(new Date());S.weights=S.weights.filter(x=>x.date!==k);S.weights.push({date:k,kg});S.weights.sort((a,b)=>a.date<b.date?-1:1)}
@@ -565,7 +567,7 @@ function vGym(){
    <button class="card prog ${S.manual?"on":""}" id="manT"><h3>Target manual</h3><div class="small muted">${S.manual?`Aktif: ${S.manual.kcal} kkal · P ${S.manual.p}g`:"Atur angka sendiri"}</div></button></div>
   <h2>Program gym</h2>`;
   if(S.active){h+=`<button class="btn block" id="resume">Lanjutkan sesi: ${esc(S.active.dayName)}</button>`}
-  h+=`<div class="card stack"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><h3>${esc(prog.name)}</h3><div class="small muted">${esc(prog.freq)} · ${esc(prog.lv)}</div></div><button class="btn sm ghost" id="chg">Ganti</button></div>
+  h+=`<div class="card stack"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><h3>${esc(prog.name)}</h3><div class="small muted">${esc(prog.freq)} · ${esc(prog.lv)}${prog.g?" · program "+GLABEL[prog.g]:""}</div></div><button class="btn sm ghost" id="chg">Ganti</button></div>
    <div class="small">${esc(prog.desc)}</div>
    <div class="seg" id="dseg">${prog.days.map((d,i)=>`<button data-d="${i}" class="${i===next?"on":""}">${i===next?"▸ ":""}${esc(d.name.split(" (")[0])}</button>`).join("")}</div>
    <div id="dlist"></div></div></div>`;
@@ -584,10 +586,18 @@ function vGym(){
   $("#resume")&&($("#resume").onclick=openSession);
   $("#app").querySelectorAll("[data-diet]").forEach(b=>b.onclick=()=>{S.diet=b.dataset.diet;S.manual=null;save();render();toast(DIETS[S.diet].n+" aktif")});
 }
+const GLABEL={m:"pria",f:"wanita"},PDEF={m:"fb3",f:"f_fb3"};
+function progCard(p){return `<button class="card prog ${p.id===S.gym.prog?"on":""}" data-p="${p.id}"><div class="row" style="justify-content:space-between"><h3>${esc(p.name)}</h3><span class="tag">${esc(p.lv)}</span></div>
+   <div class="small muted" style="margin:4px 0">${esc(p.freq)} · ${p.days.length} hari latihan${p.g&&p.g!==S.profile.sex?" · program "+GLABEL[p.g]:""}</div><div class="small">${esc(p.desc)}</div></button>`}
 function openProgPicker(){
-  const body=`<div class="stack">${PROGRAMS.map(p=>`<button class="card prog ${p.id===S.gym.prog?"on":""}" data-p="${p.id}"><div class="row" style="justify-content:space-between"><h3>${esc(p.name)}</h3><span class="tag">${esc(p.lv)}</span></div>
-   <div class="small muted" style="margin:4px 0">${esc(p.freq)} · ${p.days.length} hari latihan</div><div class="small">${esc(p.desc)}</div></button>`).join("")}</div>`;
-  sheet("Pilih program gym",body,(sh,close)=>{sh.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{S.gym={prog:b.dataset.p,next:0};save();close();render()})});
+  const sex=S.profile.sex, mine=PROGRAMS.filter(p=>!p.g||p.g==="all"||p.g===sex), other=PROGRAMS.filter(p=>!mine.includes(p));
+  const body=`<div class="stack"><div class="lbl">Rekomendasi untuk ${GLABEL[sex]}${S.profile.example?" (profil contoh)":""}</div>
+   ${mine.map(progCard).join("")}
+   ${other.length?`<button class="addline" id="pall">Tampilkan program ${GLABEL[sex==="m"?"f":"m"]} juga (${other.length})</button><div class="stack" id="pother" hidden><div class="lbl">Program ${GLABEL[sex==="m"?"f":"m"]}</div>${other.map(progCard).join("")}</div>`:""}
+   <p class="small muted" style="margin:0">Prinsip latihan pria & wanita sama. Bedanya di fokus otot: program wanita lebih banyak bokong, paha, dan core; program pria lebih banyak dada, punggung, dan lengan. Gender diatur di Profil.</p></div>`;
+  sheet("Pilih program gym",body,(sh,close)=>{
+    const pa=$("#pall",sh);if(pa)pa.onclick=()=>{$("#pother",sh).hidden=false;pa.hidden=true};
+    sh.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{S.gym={prog:b.dataset.p,next:0};save();close();render()})});
 }
 
 /* ---------- session ---------- */

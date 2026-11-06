@@ -8,7 +8,7 @@ Aplikasi Android untuk tracking asupan harian (kalori, protein, karbo, lemak, se
 
 - **Catat makanan** per waktu makan, dari database ±110 makanan (kebanyakan makanan Indonesia), input manual, atau **foto makanan** yang dihitung otomatis oleh Gemini.
 - **Target harian** dihitung dari profil (Mifflin-St Jeor × faktor aktivitas), dengan program diet Cutting, Rekomposisi, Maintenance, Lean bulk, atau target manual.
-- **Program gym** siap pakai (Full Body Pemula, Upper/Lower, PPL, Home Workout, Fat Loss) dengan pencatat set, timer istirahat, dan beban sesi lalu terisi otomatis.
+- **Program gym** siap pakai, 5 untuk pria dan 5 untuk wanita (otomatis menyesuaikan gender di profil), dengan pencatat set, timer istirahat, dan beban sesi lalu terisi otomatis.
 - **115 gerakan** dengan gambar posisi awal & akhir, otot yang dilatih, dan langkah.
 - **Progres**: grafik kalori 7 hari, berat badan, riwayat latihan, backup & pulihkan.
 - Jalan **offline**. Internet cuma dipakai untuk analisis foto.

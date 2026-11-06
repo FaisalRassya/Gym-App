@@ -15,10 +15,11 @@ Status: `[x]` selesai · `[ ]` belum
 - [x] Target harian dari profil (rumus Mifflin-St Jeor + faktor aktivitas)
 - [x] Program diet: Cutting, Rekomposisi, Maintenance, Lean bulk, atau target manual
 - [x] Pencatat air minum
-- [x] 5 program gym siap pakai: Full Body Pemula, Upper/Lower, Push/Pull/Legs, Home Workout, Fat Loss
+- [x] 10 program gym siap pakai: 5 untuk pria (Full Body Pemula, Upper/Lower, Push/Pull/Legs, Home Workout, Fat Loss) dan 5 untuk wanita (Full Body Pemula, Glute & Legs Focus, Upper/Lower Toning, Home Workout, Fat Loss + Toning)
+- [x] Daftar program otomatis menyesuaikan gender di profil, program gender lain tetap bisa dipilih
 - [x] Sesi latihan: catat kg & reps per set, timer istirahat 90 detik, beban sesi lalu terisi otomatis
 - [x] 115 gerakan dengan gambar posisi awal & akhir, otot yang dilatih, dan langkah
-- [x] Foto makanan → estimasi gizi otomatis pakai Gemini (API key sendiri)
+- [x] Foto makanan → estimasi gizi otomatis pakai Gemini (API key sendiri), dengan indikator progres dan batas waktu
 - [x] Grafik kalori 7 hari, grafik berat badan, riwayat latihan
 - [x] Backup & pulihkan lewat salin-tempel kode
 - [x] APK native, jalan offline, build otomatis di GitHub Actions
