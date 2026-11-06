@@ -1,0 +1,9 @@
+{
+  "appId": "com.faisal.gizigym",
+  "appName": "GiziGym",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#EEF1EC",
+    "adjustMarginsForEdgeToEdge": "auto"
+  }
+}
