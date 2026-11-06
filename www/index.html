@@ -9,152 +9,179 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="fonts/fonts.css">
 <style>
-/* Layout: one-column phone app, sticky header, bottom tab bar, slide-up sheets for input */
+/* Layout: one phone column. The day is printed as an Indonesian "Informasi Nilai Gizi" panel
+   (heavy black rules, % target column, footnote); everything else is quiet ruled lists, not boxed cards.
+   Macro colours are bumper-plate colours: red protein, yellow carbs, blue fat, green fibre.
+   One family (Archivo): condensed black for numbers & titles, normal width for reading. */
 :root{
-  --bg:#EEF1EC; --surface:#FFFFFF; --sunk:#E3E8E1; --line:#D3DAD0;
-  --fg:#18211C; --muted:#5F6B64; --accent:#1E6E52; --accent-fg:#FFFFFF; --accent-soft:#D5EBDF;
-  --pro:#C24E36; --carb:#C98C1C; --fat:#4C67AE; --fib:#3D8A4A; --water:#2F86B5; --warn:#B4541E;
-  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
-  --body:"Figtree", "Segoe UI", Roboto, system-ui, sans-serif;
-  --r:14px; --dock:0px;
+  --paper:#EDF0F2; --sheet:#FFFFFF; --ink:#000000; --ink-2:#4A535B; --hair:#C9D0D6; --wash:#DFE4E8; --on-ink:#FFFFFF;
+  --pro:#D42A2F; --carb:#E3A400; --fat:#1F5FBF; --fib:#1B8A45; --warn:#C2410C;
+  --font:"Archivo","Roboto Condensed","Arial Narrow",Roboto,system-ui,sans-serif;
+  --dock:0px;
+  /* aliases used by inline styles */
+  --bg:var(--paper); --fg:var(--ink); --surface:var(--sheet); --sunk:var(--wash); --line:var(--hair); --muted:var(--ink-2);
+  --accent:var(--ink); --accent-fg:var(--on-ink); --accent-soft:var(--wash); --water:var(--ink);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#111714; --surface:#1A221E; --sunk:#232D28; --line:#2E3A34;
-  --fg:#E7EEE9; --muted:#9AA8A0; --accent:#5CC49A; --accent-fg:#0D1A14; --accent-soft:#1F3A2E;
-  --pro:#E7836C; --carb:#E2B04F; --fat:#8DA4E6; --fib:#7CC489; --water:#6BB8E0; --warn:#E8955F; color-scheme:dark}}
+  --paper:#1B1F23; --sheet:#242A2F; --ink:#F3F5F6; --ink-2:#A1ABB3; --hair:#3A424A; --wash:#2D343A; --on-ink:#1B1F23;
+  --pro:#FF5B60; --carb:#FFC737; --fat:#64A2FF; --fib:#43C476; --warn:#FF8B4D; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#111714; --surface:#1A221E; --sunk:#232D28; --line:#2E3A34;
-  --fg:#E7EEE9; --muted:#9AA8A0; --accent:#5CC49A; --accent-fg:#0D1A14; --accent-soft:#1F3A2E;
-  --pro:#E7836C; --carb:#E2B04F; --fat:#8DA4E6; --fib:#7CC489; --water:#6BB8E0; --warn:#E8955F; color-scheme:dark}
+  --paper:#1B1F23; --sheet:#242A2F; --ink:#F3F5F6; --ink-2:#A1ABB3; --hair:#3A424A; --wash:#2D343A; --on-ink:#1B1F23;
+  --pro:#FF5B60; --carb:#FFC737; --fat:#64A2FF; --fib:#43C476; --warn:#FF8B4D; color-scheme:dark}
 *{box-sizing:border-box}
 html,body{min-height:100%}
-body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;-webkit-tap-highlight-color:transparent}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+body{background:var(--paper);color:var(--ink);font-family:var(--font);font-size:15.5px;line-height:1.45;font-weight:420;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--paper)}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.num{font-variant-numeric:tabular-nums}
+:focus-visible{outline:2.5px solid var(--ink);outline-offset:2px}
+.num,b,.kc{font-variant-numeric:tabular-nums}
 .wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 calc(120px + var(--dock))}
-header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);padding-block:12px 10px;display:flex;align-items:center;gap:10px}
-.brand{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.02em}
-.brand b{color:var(--accent)}
-.datenav{margin-left:auto;display:flex;align-items:center;gap:4px}
-.datenav button{border:0;background:var(--surface);width:34px;height:34px;border-radius:10px;font-size:18px}
-.datenav span{min-width:92px;text-align:center;font-weight:600;font-size:14px}
-h2{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-.02em;margin:14px 0 4px;text-wrap:balance}
-h3{font-family:var(--display);font-weight:600;font-size:17px;margin:0;text-wrap:balance}
-.lbl{font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
-.muted{color:var(--muted)}
-.small{font-size:13px}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);padding-block:14px 12px;display:flex;align-items:center;gap:10px}
+.brand{font-weight:900;font-stretch:68%;font-size:30px;line-height:1;letter-spacing:-.01em}
+.datenav{margin-left:auto;display:flex;align-items:center;gap:6px}
+.datenav button{border:1.5px solid var(--ink);background:transparent;width:36px;height:36px;border-radius:6px;font-size:18px;line-height:1}
+.datenav span{min-width:96px;text-align:center;font-weight:700;font-stretch:85%;font-size:15px}
+h2{font-weight:900;font-stretch:72%;font-size:30px;line-height:1.05;margin:22px 0 6px;text-wrap:balance}
+h3{font-weight:750;font-stretch:85%;font-size:18.5px;line-height:1.2;margin:0;text-wrap:balance}
+.lbl{font-size:13px;color:var(--ink-2);font-weight:600}
+.muted{color:var(--ink-2)}
+.small{font-size:13.5px}
 .stack{display:flex;flex-direction:column;gap:12px}
 .row{display:flex;align-items:center;gap:10px}
-.card{background:var(--surface);border-radius:var(--r);padding:16px}
-.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:600;background:var(--accent);color:var(--accent-fg)}
-.btn.ghost{background:var(--sunk);color:var(--fg)}
-.btn.sm{padding:8px 12px;font-size:13.5px;border-radius:10px}
+/* sections are ruled, not boxed */
+.card{background:none;border-top:2px solid var(--ink);padding:12px 0 4px}
+.btn{border:0;border-radius:6px;padding:12px 16px;font-weight:700;font-stretch:90%;background:var(--ink);color:var(--on-ink);text-decoration:none}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.btn.sm{padding:7px 12px;font-size:14px}
 .btn.block{width:100%}
-.btn:disabled{opacity:.5}
-.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;white-space:nowrap}
-.chip.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn:disabled{opacity:.4}
+.chip{border:1.5px solid var(--hair);background:transparent;border-radius:5px;padding:6px 11px;font-size:14px;font-weight:600;white-space:nowrap}
+.chip.on{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
 .chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
-input[type=text],input[type=number],input[type=search],select,textarea{width:100%;background:var(--sunk);border:1px solid transparent;border-radius:10px;padding:10px 12px;min-width:0}
-input:focus,select:focus,textarea:focus{border-color:var(--accent);outline:none}
+input[type=text],input[type=number],input[type=search],select,textarea{width:100%;background:var(--sheet);border:1.5px solid var(--hair);border-radius:6px;padding:10px 12px;min-width:0}
+input:focus,select:focus,textarea:focus{border-color:var(--ink);outline:none}
 .field{display:flex;flex-direction:column;gap:4px;min-width:0}
-.field span{font-size:12.5px;color:var(--muted);font-weight:600}
+.field span{font-size:13px;color:var(--ink-2);font-weight:600}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-
-/* Today summary */
-.hero{display:grid;grid-template-columns:132px 1fr;gap:16px;align-items:center}
-.ring{position:relative;width:132px;height:132px}
-.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
-.ring .in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-.ring .big{font-family:var(--display);font-weight:800;font-size:30px;line-height:1}
-.macro{display:flex;flex-direction:column;gap:3px}
-.macro .t{display:flex;justify-content:space-between;font-size:13px}
-.macro .t b{font-weight:600}
-.bar{height:7px;border-radius:9px;background:var(--sunk);overflow:hidden}
-.bar i{display:block;height:100%;border-radius:9px;transition:width .4s}
+a{color:var(--ink);text-underline-offset:2px}
 .over{color:var(--warn)!important}
-.water{display:flex;align-items:center;gap:12px}
+
+/* Informasi Nilai Gizi panel */
+.nlabel{background:var(--sheet);border:2.5px solid var(--ink);padding:10px 12px 12px}
+.nl-title{font-weight:900;font-stretch:66%;font-size:36px;line-height:.95;margin:0;letter-spacing:-.005em}
+.nl-sub{font-size:14px;margin-top:5px;display:flex;justify-content:space-between;gap:10px}
+.nl-rule{height:10px;background:var(--ink);margin:8px 0 6px}
+.nl-rule.mid{height:4px;margin:8px 0 2px}
+.nl-energy{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.nl-energy .k{font-weight:800;font-stretch:80%;font-size:19px}
+.nl-energy .v{font-weight:900;font-stretch:66%;font-size:48px;line-height:.9}
+.nl-energy .v small{font-size:17px;font-weight:700;font-stretch:85%;margin-left:4px}
+.nl-meter{height:12px;border:1.5px solid var(--ink);margin:9px 0 5px;position:relative;overflow:hidden}
+.nl-meter i{position:absolute;inset:0 auto 0 0;background:var(--ink);transition:width .4s}
+.nl-meter.over i{background:var(--warn)}
+.nl-left{font-size:14.5px;display:flex;justify-content:space-between;gap:10px}
+.nl-left b{font-weight:800}
+.nl-head,.nl-row{display:grid;grid-template-columns:1fr 76px 64px;align-items:baseline;text-align:right}
+.nl-head{font-size:12.5px;font-weight:700;padding:4px 0 2px}
+.nl-row{padding:7px 0;border-top:1px solid var(--ink)}
+.nl-row>span:first-child{text-align:left;font-weight:700;display:flex;align-items:center;gap:9px}
+.nl-row b{font-weight:800;font-stretch:85%;font-size:16.5px}
+.pl{display:inline-block;width:6px;height:17px;border-radius:2px;flex:none;align-self:center}
+.nl-water{display:flex;align-items:center;gap:12px;padding-top:8px;border-top:1px solid var(--ink)}
+.nl-water .k{font-weight:700;min-width:76px}
+.nl-foot{font-size:12px;line-height:1.4;margin:10px 0 0}
 .cups{display:flex;gap:5px;flex-wrap:wrap;flex:1}
-.cup{width:22px;height:28px;border-radius:4px 4px 7px 7px;border:2px solid var(--water);background:transparent;padding:0}
-.cup.f{background:var(--water)}
-.meal-h{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}
-.item{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.cup{width:20px;height:26px;border-radius:2px 2px 6px 6px;border:2px solid var(--ink);background:transparent;padding:0}
+.cup.f{background:var(--ink)}
+
+/* ruled lists */
+.meal-h{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+.meal-h h3{flex:1}
+.meal-h .kc{font-weight:800;font-stretch:85%;font-size:16px}
+.tbtn{border:0;background:none;padding:6px 0 6px 10px;font-weight:700;font-stretch:90%;text-decoration:underline;text-underline-offset:3px}
+.item{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--hair)}
 .item:first-of-type{border-top:0}
 .item .nm{flex:1;min-width:0}
-.item .nm div:first-child{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.item .kc{font-weight:700;font-size:14px}
-.x{border:0;background:transparent;color:var(--muted);font-size:20px;width:30px;height:30px;border-radius:8px}
-.addline{border:1px dashed var(--line);background:transparent;border-radius:10px;padding:9px;width:100%;color:var(--accent);font-weight:600;margin-top:6px}
-.dots{display:inline-flex;gap:6px;font-size:12px;color:var(--muted)}
-.dots i{font-style:normal}
-.dots i::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:3px;background:currentColor;vertical-align:1px}
-.d-p{color:var(--pro)}.d-c{color:var(--carb)}.d-f{color:var(--fat)}.d-s{color:var(--fib)}
+.item .nm div:first-child{font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .kc{font-weight:800;font-stretch:85%;font-size:15.5px}
+.empty-line{color:var(--ink-2);font-size:14px;padding:4px 0 8px}
+.x{border:0;background:transparent;color:var(--ink-2);font-size:22px;width:32px;height:32px;border-radius:6px}
+.addline{border:1.5px dashed var(--ink-2);background:transparent;border-radius:6px;padding:10px;width:100%;color:var(--ink);font-weight:700;font-stretch:90%;margin-top:6px}
+.dots{display:inline-flex;gap:8px;font-size:12.5px;color:var(--ink-2);flex-wrap:wrap}
+.dots i{font-style:normal;color:var(--ink-2)}
+.dots i::before{content:"";display:inline-block;width:4px;height:11px;border-radius:1.5px;margin-right:3px;vertical-align:-1px}
+.d-p::before{background:var(--pro)}.d-c::before{background:var(--carb)}.d-f::before{background:var(--fat)}.d-s::before{background:var(--fib)}
+.tag{display:inline-block;font-size:12px;font-weight:650;padding:0 5px;border-radius:3px;border:1px solid currentColor;color:var(--ink-2);vertical-align:1px}
 
 /* Tabs */
-nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:calc(env(safe-area-inset-bottom,0px) + var(--dock));padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-nav.tabs button{border:0;background:transparent;padding:8px 0 10px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11.5px;color:var(--muted);font-weight:600}
-nav.tabs button svg{width:24px;height:24px}
-nav.tabs button.on{color:var(--accent)}
-nav.tabs .plus span{width:46px;height:46px;border-radius:15px;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;margin-top:-18px;box-shadow:0 4px 14px rgb(0 0 0 / .18)}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--sheet);border-top:2px solid var(--ink);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:calc(env(safe-area-inset-bottom,0px) + var(--dock));padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+nav.tabs button{border:0;background:transparent;padding:9px 0 10px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;font-weight:650;font-stretch:88%;color:var(--ink-2)}
+nav.tabs button svg{width:23px;height:23px}
+nav.tabs button.on{color:var(--ink);font-weight:800;box-shadow:inset 0 3px 0 var(--ink)}
+nav.tabs .plus{color:var(--ink)}
+nav.tabs .plus span{width:42px;height:30px;border-radius:6px;background:var(--ink);color:var(--on-ink);display:grid;place-items:center}
+nav.tabs .plus span svg{width:20px;height:20px}
 
 /* Sheets */
-.scrim{position:fixed;inset:0;background:rgb(0 0 0 / .45);z-index:40}
-.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--bg);border-radius:20px 20px 0 0;max-height:92%;display:flex;flex-direction:column;max-width:600px;margin:0 auto;animation:up .22s ease-out}
-@keyframes up{from{transform:translateY(40px);opacity:.4}}
-@media (prefers-reduced-motion:reduce){.sheet{animation:none}.bar i{transition:none}}
-.sheet .sh{display:flex;align-items:center;gap:8px;padding:14px max(16px,env(safe-area-inset-right,0px)) 8px max(16px,env(safe-area-inset-left,0px))}
-.sheet .sb{overflow-y:auto;padding:4px max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px) + var(--dock)) max(16px,env(safe-area-inset-left,0px))}
-.sheet .sh h3{flex:1}
-.food{display:flex;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid var(--line);background:none;border-left:0;border-right:0;border-top:0;width:100%;text-align:left}
+.scrim{position:fixed;inset:0;background:rgb(0 0 0 / .5);z-index:40}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--paper);border-radius:14px 14px 0 0;max-height:92%;display:flex;flex-direction:column;max-width:600px;margin:0 auto;animation:up .2s ease-out}
+@keyframes up{from{transform:translateY(32px);opacity:.5}}
+@media (prefers-reduced-motion:reduce){.sheet{animation:none}.nl-meter i{transition:none}}
+.sheet .sh{display:flex;align-items:center;gap:8px;padding:16px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));border-bottom:2px solid var(--ink)}
+.sheet .sh h3{flex:1;font-weight:900;font-stretch:72%;font-size:24px}
+.sheet .sb>.card:first-child,.sheet .sb>.stack>.card:first-child{border-top:0;padding-top:0}
+.sheet .sb{overflow-y:auto;padding:12px max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px) + var(--dock)) max(16px,env(safe-area-inset-left,0px))}
+.food{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--hair);background:none;border-left:0;border-right:0;border-top:0;width:100%;text-align:left}
 .food .nm{flex:1;min-width:0}
-.food .nm div:first-child{font-weight:600}
+.food .nm div:first-child{font-weight:650}
+.food b{font-weight:800;font-stretch:85%}
 .stepper{display:flex;align-items:center;gap:8px}
-.stepper button{width:40px;height:40px;border-radius:10px;border:0;background:var(--sunk);font-size:20px;font-weight:700}
-.stepper input{text-align:center;width:80px;font-weight:700;font-size:18px}
-.macgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center}
-.macgrid div{background:var(--surface);border-radius:10px;padding:8px 2px}
-.macgrid b{display:block;font-size:16px}
-.macgrid span{font-size:11px;color:var(--muted)}
+.stepper button{width:42px;height:42px;border-radius:6px;border:1.5px solid var(--ink);background:transparent;font-size:20px;font-weight:700}
+.stepper input{text-align:center;width:80px;font-weight:800;font-size:19px}
+.macgrid{display:grid;grid-template-columns:repeat(5,1fr);text-align:center;border:2px solid var(--ink);background:var(--sheet)}
+.macgrid div{padding:8px 2px;border-left:1px solid var(--ink)}
+.macgrid div:first-child{border-left:0}
+.macgrid b{display:block;font-size:18px;font-weight:900;font-stretch:72%}
+.macgrid span{font-size:11.5px;color:var(--ink-2)}
 
 /* Gym */
-.prog{border:2px solid transparent;text-align:left;width:100%}
-.prog.on{border-color:var(--accent)}
-.tag{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
-.exrow{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line);background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left}
+.card.prog{border-top:1px solid var(--hair);position:relative;padding:14px 0 14px 32px;text-align:left;width:100%;border-left:0;border-right:0;border-bottom:0;background:none}
+.card.prog::before{content:"";position:absolute;left:2px;top:17px;width:18px;height:18px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--ink-2)}
+.card.prog.on::before{box-shadow:inset 0 0 0 6px var(--ink)}
+.exrow{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--hair);background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left}
 .exrow:first-child{border-top:0}
-.thumb{width:72px;height:48px;border-radius:8px;object-fit:cover;background:var(--sunk);flex:none}
+.thumb{width:72px;height:48px;border-radius:4px;object-fit:cover;background:#fff;flex:none;border:1px solid var(--hair)}
 .exrow .nm{flex:1;min-width:0}
-.exrow .nm div:first-child{font-weight:600}
-.demo{position:relative;border-radius:12px;overflow:hidden;background:#fff;aspect-ratio:3/2;max-width:100%}
+.exrow .nm div:first-child{font-weight:650}
+.demo{position:relative;border-radius:6px;overflow:hidden;background:#fff;aspect-ratio:3/2;max-width:100%;border:2px solid var(--ink)}
 .demo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transition:opacity .35s}
-.demo .cap{position:absolute;left:8px;bottom:8px;background:rgb(0 0 0 / .65);color:#fff;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px}
-.demo .ctl{position:absolute;right:8px;bottom:8px;display:flex;gap:4px}
-.demo .ctl button{border:0;background:rgb(0 0 0 / .65);color:#fff;border-radius:999px;font-size:12px;padding:4px 10px;font-weight:600}
+.demo .cap{position:absolute;left:0;bottom:0;background:#000;color:#fff;font-size:13px;font-weight:700;font-stretch:85%;padding:5px 10px}
+.demo .ctl{position:absolute;right:0;bottom:0;display:flex}
+.demo .ctl button{border:0;background:#000;color:#fff;font-size:13px;padding:5px 12px;font-weight:700}
 ol.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
 .setrow{display:grid;grid-template-columns:28px 1fr 1fr 44px;gap:8px;align-items:center;margin-top:6px}
-.setrow input{text-align:center;padding:8px 4px}
-.chk{width:44px;height:38px;border-radius:10px;border:2px solid var(--line);background:transparent;font-weight:800}
-.chk.on{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
-.rest{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px) + var(--dock));z-index:30;background:var(--fg);color:var(--bg);border-radius:999px;padding:10px 10px 10px 18px;display:flex;align-items:center;gap:12px;font-weight:700;box-shadow:0 6px 20px rgb(0 0 0 / .25)}
-.rest button{border:0;border-radius:999px;padding:6px 12px;background:var(--bg);color:var(--fg);font-weight:600;font-size:13px}
-.toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(64px + env(safe-area-inset-top,0px));z-index:60;background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;max-width:90%}
-.empty{text-align:center;padding:22px 10px;color:var(--muted)}
+.setrow input{text-align:center;padding:8px 4px;font-weight:700}
+.chk{width:44px;height:40px;border-radius:6px;border:2px solid var(--ink-2);background:transparent;font-weight:900;color:transparent}
+.chk.on{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.rest{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px) + var(--dock));z-index:55;background:var(--ink);color:var(--on-ink);border-radius:8px;padding:8px 8px 8px 16px;display:flex;align-items:center;gap:12px;font-weight:800;font-stretch:85%;font-size:17px}
+.rest button{border:0;border-radius:5px;padding:6px 11px;background:var(--on-ink);color:var(--ink);font-weight:700;font-size:13.5px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(70px + env(safe-area-inset-top,0px));z-index:60;background:var(--ink);color:var(--on-ink);padding:10px 14px;border-radius:6px;font-weight:650;font-size:14.5px;max-width:90%}
+.empty{text-align:center;padding:22px 10px;color:var(--ink-2)}
 .chart{width:100%;height:auto;display:block}
-.note{background:var(--accent-soft);border-radius:12px;padding:12px 14px;font-size:13.5px}
-.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--sunk);border-radius:12px;padding:3px;gap:3px}
-.seg button{border:0;background:transparent;border-radius:9px;padding:8px 4px;font-weight:600;font-size:13.5px;color:var(--muted)}
-.seg button.on{background:var(--surface);color:var(--fg)}
-a{color:var(--accent)}
-.status-box{display:flex;gap:10px;align-items:center;background:var(--sunk);border-radius:10px;padding:10px 12px;font-size:14px}
-.status-box.err{display:block;background:var(--surface);border:1.5px solid var(--warn);color:var(--fg)}
-.spin{flex:none;width:18px;height:18px;border:2.5px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+.note{border:1.5px dashed var(--ink-2);border-radius:6px;padding:10px 12px;font-size:14px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;border:1.5px solid var(--ink);border-radius:6px;overflow:hidden}
+.seg button{border:0;border-left:1.5px solid var(--ink);background:transparent;padding:9px 4px;font-weight:700;font-stretch:88%;font-size:14px;color:var(--ink)}
+.seg button:first-child{border-left:0}
+.seg button.on{background:var(--ink);color:var(--on-ink)}
+.status-box{display:flex;gap:10px;align-items:center;border:1.5px solid var(--hair);background:var(--sheet);border-radius:6px;padding:10px 12px;font-size:14px}
+.status-box.err{display:block;border:2px solid var(--warn);color:var(--ink)}
+.spin{flex:none;width:18px;height:18px;border:2.5px solid var(--hair);border-top-color:var(--ink);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.spin{animation-duration:2.4s}}
-input[type=checkbox]{accent-color:var(--accent)}
+input[type=checkbox]{accent-color:var(--ink)}
 </style>
 
 <div class="wrap" id="app"></div>
@@ -234,41 +261,42 @@ function guessMeal(){const h=new Date().getHours();return h<10?"pagi":h<15?"sian
 /* ---------- render ---------- */
 function render(){renderTabs();({today:vToday,gym:vGym,lib:vLib,stats:vStats})[tab]()}
 
-function ring(pct,color){const R=56,C=2*Math.PI*R,v=Math.min(pct,1);
-  return `<svg viewBox="0 0 132 132"><circle cx="66" cy="66" r="${R}" fill="none" stroke="var(--sunk)" stroke-width="12"/>
-  <circle cx="66" cy="66" r="${R}" fill="none" stroke="${color}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-v)}"/></svg>`}
-function mbar(label,val,tgt,col,unit="g"){const pct=tgt?val/tgt*100:0;
-  return `<div class="macro"><div class="t"><b style="color:${col}">${label}</b><span class="num ${pct>110&&label!=="Serat"&&label!=="Protein"?"over":""}">${r0(val)} / ${tgt} ${unit}</span></div><div class="bar"><i style="width:${Math.min(pct,100)}%;background:${col}"></i></div></div>`}
-
+const fmt=n=>Math.round(n).toLocaleString("id-ID");
 function vToday(){
   const k=dkey(cur), t=targets(), tot=totals(k), d=S.log[k]||{items:[],water:0};
-  const left=t.kcal-tot.kcal, over=left<0;
-  let h=`<header class="top"><div class="brand">Gizi<b>Gym</b></div>
+  const left=t.kcal-tot.kcal, over=left<0, pct=v=>t&&v?Math.round(v):0;
+  const dietName=S.manual?"target manual":(DIETS[S.diet]||DIETS.maint).n.replace(/ \(.*\)/,"");
+  const row=(name,cls,val,tgt,warnOver)=>{const pc=tgt?Math.round(val/tgt*100):0;
+    return `<div class="nl-row"><span><i class="pl" style="background:var(--${cls})"></i>${name}</span><b>${fmt(val)} g</b><b class="${warnOver&&pc>110?"over":""}">${pc}%</b></div>`};
+  let h=`<header class="top"><div class="brand">GiziGym</div>
    <div class="datenav"><button id="dprev" aria-label="Hari sebelumnya">‹</button><span>${niceDate(cur)}</span><button id="dnext" aria-label="Hari berikutnya">›</button></div></header>
-  <div class="stack">`;
-  if(S.profile.example) h+=`<div class="note">Target di bawah masih pakai <b>profil contoh</b> (pria, 25 th, 70 kg, 170 cm). <button class="btn sm" id="goProf" style="margin-left:4px">Isi profilku</button></div>`;
-  h+=`<div class="card hero">
-    <div class="ring">${ring(tot.kcal/t.kcal,over?"var(--warn)":"var(--accent)")}<div class="in"><div class="big num ${over?"over":""}">${Math.abs(r0(left))}</div><div class="small muted">${over?"kkal lebih":"kkal tersisa"}</div></div></div>
-    <div class="stack" style="gap:9px">
-      <div class="small muted num">Masuk <b style="color:var(--fg)">${r0(tot.kcal)}</b> dari ${t.kcal} kkal</div>
-      ${mbar("Protein",tot.p,t.p,"var(--pro)")}${mbar("Karbo",tot.c,t.c,"var(--carb)")}${mbar("Lemak",tot.f,t.f,"var(--fat)")}${mbar("Serat",tot.fib,t.fib,"var(--fib)")}
-    </div></div>
-  <div class="card water"><div><div class="lbl">Air</div><div class="num" style="font-weight:700">${d.water||0}/${S.water} gelas</div></div>
-    <div class="cups">${Array.from({length:S.water},(_,i)=>`<button class="cup ${i<(d.water||0)?"f":""}" data-cup="${i}" aria-label="Gelas ${i+1}"></button>`).join("")}</div></div>`;
+  <div class="stack" style="gap:22px">`;
+  if(S.profile.example) h+=`<div class="note row" style="justify-content:space-between">Target masih pakai profil contoh (pria, 25 th, 70 kg). <button class="btn sm" id="goProf">Isi profilku</button></div>`;
+  h+=`<section class="nlabel" aria-label="Ringkasan gizi ${niceDate(cur).toLowerCase()}">
+    <h2 class="nl-title">Informasi Nilai Gizi</h2>
+    <div class="nl-sub"><span>Takaran saji: semua yang dimakan ${niceDate(cur).toLowerCase()}</span><span>${d.items.length} item</span></div>
+    <div class="nl-rule"></div>
+    <div class="nl-energy"><span class="k">Energi total</span><span class="v num ${over?"over":""}">${fmt(tot.kcal)}<small>kkal</small></span></div>
+    <div class="nl-meter ${over?"over":""}"><i style="width:${Math.min(100,t.kcal?tot.kcal/t.kcal*100:0)}%"></i></div>
+    <div class="nl-left"><span>${over?`Lebih <b class="over">${fmt(-left)} kkal</b> dari target`:`Sisa <b>${fmt(left)} kkal</b>`}</span><span class="muted">target ${fmt(t.kcal)}</span></div>
+    <div class="nl-rule mid"></div>
+    <div class="nl-head"><span></span><span>Jumlah</span><span>% target*</span></div>
+    ${row("Protein","pro",tot.p,t.p,false)}${row("Karbohidrat","carb",tot.c,t.c,true)}${row("Lemak","fat",tot.f,t.f,true)}${row("Serat pangan","fib",tot.fib,t.fib,false)}
+    <div class="nl-water"><span class="k">Air minum</span><div class="cups">${Array.from({length:S.water},(_,i)=>`<button class="cup ${i<(d.water||0)?"f":""}" data-cup="${i}" aria-label="Gelas ${i+1}"></button>`).join("")}</div><b class="num">${d.water||0}/${S.water}</b></div>
+    <p class="nl-foot">*Persen target dihitung dari kebutuhan harianmu: ${fmt(t.kcal)} kkal, program ${esc(dietName)}. Kebutuhan tiap orang bisa lebih tinggi atau lebih rendah.</p>
+  </section>`;
   for(const [m,label] of MEALS){
     const items=d.items.map((x,i)=>[x,i]).filter(([x])=>x.meal===m);
     const mk=items.reduce((a,[x])=>a+x.kcal,0);
-    h+=`<div class="card"><div class="meal-h"><h3>${label}</h3><span class="small muted num">${r0(mk)} kkal</span></div>
-    ${items.map(([x,i])=>`<div class="item"><div class="nm"><div>${esc(x.name)}${x.ai?' <span class="tag">foto</span>':""}</div><div class="small muted">${esc(x.q)}
-      <span class="dots"><i class="d-p num">${r1(x.p)}g</i><i class="d-c num">${r1(x.c)}g</i><i class="d-f num">${r1(x.f)}g</i><i class="d-s num">${r1(x.fib)}g</i></span></div></div>
-      <span class="kc num">${r0(x.kcal)}</span><button class="x" data-del="${i}" aria-label="Hapus ${esc(x.name)}">×</button></div>`).join("")}
-    <button class="addline" data-add="${m}">+ Tambah ${label.toLowerCase()}</button></div>`;
+    h+=`<section class="card"><div class="meal-h"><h3>${label}</h3>${items.length?`<span class="kc">${fmt(mk)} kkal</span>`:""}<button class="tbtn" data-add="${m}">+ Tambah</button></div>
+    ${items.length?items.map(([x,i])=>`<div class="item"><div class="nm"><div>${esc(x.name)}${x.ai?' <span class="tag">foto</span>':""}</div><div class="small muted">${esc(x.q)}</div>
+      <span class="dots"><i class="d-p num">${r1(x.p)} g</i><i class="d-c num">${r1(x.c)} g</i><i class="d-f num">${r1(x.f)} g</i><i class="d-s num">${r1(x.fib)} g</i></span></div>
+      <span class="kc">${fmt(x.kcal)}</span><button class="x" data-del="${i}" aria-label="Hapus ${esc(x.name)}">×</button></div>`).join(""):`<div class="empty-line">Belum ada yang dicatat.</div>`}</section>`;
   }
   const w=S.workouts.filter(x=>x.date===k);
-  h+=`<div class="card"><div class="meal-h"><h3>Latihan</h3><span class="small muted">${w.length?w.length+" sesi":"belum ada"}</span></div>
-   ${w.map(x=>`<div class="item"><div class="nm"><div>${esc(x.dayName)}</div><div class="small muted">${esc(x.progName)} · ${x.done} set selesai · volume ${r0(x.vol)} kg</div></div></div>`).join("")}
-   <button class="addline" id="goGym">${S.active?"Lanjutkan sesi latihan":"Mulai latihan hari ini"}</button></div>
-  <div class="small muted" style="text-align:center">Legenda: <span class="dots"><i class="d-p">protein</i><i class="d-c">karbo</i><i class="d-f">lemak</i><i class="d-s">serat</i></span></div>
+  h+=`<section class="card"><div class="meal-h"><h3>Latihan</h3>${w.length?`<span class="kc">${w.length} sesi</span>`:""}</div>
+   ${w.map(x=>`<div class="item"><div class="nm"><div>${esc(x.dayName)}</div><div class="small muted">${esc(x.progName)}, ${x.done} set, volume ${fmt(x.vol)} kg</div></div></div>`).join("")}
+   <button class="addline" id="goGym">${S.active?"Lanjutkan sesi latihan":"Mulai latihan hari ini"}</button></section>
   </div>`;
   $("#app").innerHTML=h;
   $("#dprev").onclick=()=>{cur.setDate(cur.getDate()-1);render()};
@@ -306,7 +334,7 @@ function openAdd(meal){
       let arr=words.length?allFoods().filter(f=>words.every(w=>f[0].toLowerCase().includes(w))):recent();
       const head=words.length?"":(arr.length?`<div class="lbl" style="margin-top:6px">Terakhir dicatat</div>`:"");
       if(!words.length&&!arr.length){arr=FOODS.slice(0,12)}
-      $("#flist",sh).innerHTML=head+(arr.length?arr.slice(0,60).map((f,i)=>`<button class="food" data-f="${esc(f[0])}"><div class="nm"><div>${esc(f[0])}${f[7]?' <span class="tag">punyaku</span>':""}</div><div class="small muted">${esc(f[1])} · <span class="dots"><i class="d-p">${f[3]}g</i><i class="d-c">${f[4]}g</i><i class="d-f">${f[5]}g</i><i class="d-s">${f[6]}g</i></span></div></div><b class="num">${f[2]}</b></button>`).join("")
+      $("#flist",sh).innerHTML=head+(arr.length?arr.slice(0,60).map((f,i)=>`<button class="food" data-f="${esc(f[0])}"><div class="nm"><div>${esc(f[0])}${f[7]?' <span class="tag">punyaku</span>':""}</div><div class="small muted">${esc(f[1])}<br><span class="dots"><i class="d-p">${f[3]}g</i><i class="d-c">${f[4]}g</i><i class="d-f">${f[5]}g</i><i class="d-s">${f[6]}g</i></span></div></div><b class="num">${f[2]}</b></button>`).join("")
         :`<div class="empty">“${esc(q)}” belum ada di daftar. Pakai input manual di bawah.</div>`);
     };
     list();
@@ -441,7 +469,7 @@ function openPhoto(meal){
     let tick=null;
     const busy=msg=>{const t0=busy.t0;st.className="status-box";st.innerHTML=`<span class="spin" aria-hidden="true"></span><span><b id="pstep"></b><span class="small muted" id="ptime"></span></span>`;
       const upd=m=>{$("#pstep",sh).textContent=m;};busy.set=upd;upd(msg);clearInterval(tick);
-      tick=setInterval(()=>{const el=$("#ptime",sh);if(el)el.textContent=" · "+Math.round((Date.now()-t0)/1000)+" dtk"},500)};
+      tick=setInterval(()=>{const el=$("#ptime",sh);if(el)el.textContent=" ("+Math.round((Date.now()-t0)/1000)+" dtk)"},500)};
     const done=(msg,isErr)=>{clearInterval(tick);st.className=isErr?"status-box err":"small muted";st.textContent=msg||"";if(isErr)toast("Analisis foto gagal, lihat keterangannya")};
     go.onclick=async()=>{if(!file)return;go.disabled=true;stop.disabled=false;$("#pres",sh).innerHTML="";
       busy.t0=Date.now();busy("Menyiapkan foto…");st.scrollIntoView({block:"nearest",behavior:"smooth"});ctl=new AbortController();
@@ -469,7 +497,7 @@ Angka gizi per item untuk porsi yang terlihat, dibulatkan 1 desimal. Kalau foto 
          <span class="dots"><i class="d-p num">${r1(x.p*x.m)}g</i><i class="d-c num">${r1(x.c*x.m)}g</i><i class="d-f num">${r1(x.f*x.m)}g</i><i class="d-s num">${r1(x.fib*x.m)}g</i></span></div></div>
          <div style="text-align:right;flex:none"><b class="num">${r0(x.kcal*x.m)}</b><div><select data-m="${i}" aria-label="Porsi" style="padding:3px 4px;font-size:12.5px;width:auto">${[0.5,0.75,1,1.25,1.5,2].map(v=>`<option value="${v}" ${v===x.m?"selected":""}>${v}×</option>`).join("")}</select></div></div></div>`).join("")}
        ${res.note?`<p class="small muted" style="margin:8px 0 0">${esc(res.note)}</p>`:""}</div>
-       <button class="btn block" id="padd" style="margin-top:12px" ${sel.length?"":"disabled"}>Tambahkan ${sel.length} item · ${r0(tk)} kkal</button>
+       <button class="btn block" id="padd" style="margin-top:12px" ${sel.length?"":"disabled"}>Tambahkan ${sel.length} item (${r0(tk)} kkal)</button>
        <p class="small muted">Ini perkiraan dari foto. Cek dan ubah porsi kalau beda dengan yang kamu makan.</p>`;
       box.querySelectorAll("[data-on]").forEach(c=>c.onchange=()=>{res.items[+c.dataset.on].on=c.checked;drawRes()});
       box.querySelectorAll("[data-nm]").forEach(c=>c.oninput=()=>{res.items[+c.dataset.nm].name=c.value});
@@ -563,25 +591,25 @@ function vGym(){
   const next=S.gym.next%prog.days.length;
   let h=`<header class="top"><div class="brand">Program</div></header><div class="stack">
   <div class="card stack"><div class="row" style="justify-content:space-between"><div><div class="lbl">Profil</div>
-    <div style="font-weight:600">${p.sex==="m"?"Pria":"Wanita"}, ${p.age} th · ${p.w} kg · ${p.h} cm${p.example?' <span class="tag">contoh</span>':""}</div>
-    <div class="small muted num">BMR ${t.bmr} · TDEE ${t.tdee} kkal</div></div><button class="btn sm ghost" id="edp">Ubah</button></div></div>
+    <div style="font-weight:600">${p.sex==="m"?"Pria":"Wanita"}, ${p.age} th, ${p.w} kg, ${p.h} cm${p.example?' <span class="tag">contoh</span>':""}</div>
+    <div class="small muted num">BMR ${fmt(t.bmr)} kkal, TDEE ${fmt(t.tdee)} kkal</div></div><button class="btn sm ghost" id="edp">Ubah</button></div></div>
   <h2>Program diet</h2>
   <div class="stack">${Object.entries(DIETS).map(([k,D])=>{const tt=(()=>{const o=S.diet;S.diet=k;const m=S.manual;S.manual=null;const r=targets();S.diet=o;S.manual=m;return r})();
     return `<button class="card prog ${S.diet===k&&!S.manual?"on":""}" data-diet="${k}"><div class="row" style="justify-content:space-between"><h3>${D.n}</h3><b class="num">${tt.kcal} kkal</b></div>
     <div class="small muted" style="margin:4px 0 6px">${D.d}</div>
     <div class="dots num"><i class="d-p">P ${tt.p}g</i><i class="d-c">K ${tt.c}g</i><i class="d-f">L ${tt.f}g</i><i class="d-s">S ${tt.fib}g</i></div>
     ${tt.floored?'<div class="small" style="color:var(--warn);margin-top:4px">Dibatasi ke batas aman minimum kalori.</div>':""}</button>`}).join("")}
-   <button class="card prog ${S.manual?"on":""}" id="manT"><h3>Target manual</h3><div class="small muted">${S.manual?`Aktif: ${S.manual.kcal} kkal · P ${S.manual.p}g`:"Atur angka sendiri"}</div></button></div>
+   <button class="card prog ${S.manual?"on":""}" id="manT"><h3>Target manual</h3><div class="small muted">${S.manual?`Aktif: ${S.manual.kcal} kkal, protein ${S.manual.p} g`:"Atur angka sendiri"}</div></button></div>
   <h2>Program gym</h2>`;
   if(S.active){h+=`<button class="btn block" id="resume">Lanjutkan sesi: ${esc(S.active.dayName)}</button>`}
-  h+=`<div class="card stack"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><h3>${esc(prog.name)}</h3><div class="small muted">${esc(prog.freq)} · ${esc(prog.lv)}${prog.g?" · program "+GLABEL[prog.g]:""}</div></div><button class="btn sm ghost" id="chg">Ganti</button></div>
+  h+=`<div class="card stack"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><h3>${esc(prog.name)}</h3><div class="small muted">${esc(prog.freq)}, ${esc(prog.lv).toLowerCase()}${prog.g?", program "+GLABEL[prog.g]:""}</div></div><button class="btn sm ghost" id="chg">Ganti</button></div>
    <div class="small">${esc(prog.desc)}</div>
    <div class="seg" id="dseg">${prog.days.map((d,i)=>`<button data-d="${i}" class="${i===next?"on":""}">${i===next?"▸ ":""}${esc(d.name.split(" (")[0])}</button>`).join("")}</div>
    <div id="dlist"></div></div></div>`;
   $("#app").innerHTML=h;
   let sel=next;
   const showDay=()=>{const d=prog.days[sel];
-    $("#dlist").innerHTML=`<div class="lbl">${esc(d.name)}${sel===next?" · jadwal berikutnya":""}</div>`+d.items.map(([id,s,r])=>{const e=EXM[id];
+    $("#dlist").innerHTML=`<div class="lbl">${esc(d.name)}${sel===next?", jadwal berikutnya":""}</div>`+d.items.map(([id,s,r])=>{const e=EXM[id];
       return `<button class="exrow" data-ex="${id}"><img class="thumb" loading="lazy" src="${e.im[0]}" alt=""><div class="nm"><div>${esc(e.n)}</div><div class="small muted">${e.pm.map(m=>MUS[m]||m).join(", ")}</div></div><b class="num small">${s}×${esc(r)}</b></button>`}).join("")
       +`<button class="btn block" id="start" style="margin-top:10px">Mulai sesi ${esc(d.name.split(" (")[0])}</button>`;
     $("#dlist").querySelectorAll("[data-ex]").forEach(b=>b.onclick=()=>openEx(b.dataset.ex));
@@ -595,7 +623,7 @@ function vGym(){
 }
 const GLABEL={m:"pria",f:"wanita"},PDEF={m:"fb3",f:"f_fb3"};
 function progCard(p){return `<button class="card prog ${p.id===S.gym.prog?"on":""}" data-p="${p.id}"><div class="row" style="justify-content:space-between"><h3>${esc(p.name)}</h3><span class="tag">${esc(p.lv)}</span></div>
-   <div class="small muted" style="margin:4px 0">${esc(p.freq)} · ${p.days.length} hari latihan${p.g&&p.g!==S.profile.sex?" · program "+GLABEL[p.g]:""}</div><div class="small">${esc(p.desc)}</div></button>`}
+   <div class="small muted" style="margin:4px 0">${esc(p.freq)}, ${p.days.length} hari latihan${p.g&&p.g!==S.profile.sex?", program "+GLABEL[p.g]:""}</div><div class="small">${esc(p.desc)}</div></button>`}
 function openProgPicker(){
   const sex=S.profile.sex, mine=PROGRAMS.filter(p=>!p.g||p.g==="all"||p.g===sex), other=PROGRAMS.filter(p=>!mine.includes(p));
   const body=`<div class="stack"><div class="lbl">Rekomendasi untuk ${GLABEL[sex]}${S.profile.example?" (profil contoh)":""}</div>
@@ -624,7 +652,7 @@ function startRest(sec){clearInterval(restT);document.querySelector(".rest")?.re
 function openSession(){
   const A=S.active;if(!A)return;
   const body=`<div class="small muted" style="margin-bottom:8px">Isi beban (kg) & repetisi, lalu centang tiap set. Timer istirahat 90 dtk jalan otomatis. Tap nama gerakan untuk lihat gambar form yang benar.</div>
-   <div class="stack" id="sx">${A.ex.map((x,ei)=>{const e=EXM[x.id];return `<div class="card"><button class="exrow" data-ex="${x.id}" style="padding-top:0"><img class="thumb" src="${e.im[0]}" alt=""><div class="nm"><div>${esc(e.n)}</div><div class="small muted">Target ${x.sets.length} × ${esc(x.reps)} · lihat form ›</div></div></button>
+   <div class="stack" id="sx">${A.ex.map((x,ei)=>{const e=EXM[x.id];return `<div class="card"><button class="exrow" data-ex="${x.id}" style="padding-top:0"><img class="thumb" src="${e.im[0]}" alt=""><div class="nm"><div>${esc(e.n)}</div><div class="small muted">Target ${x.sets.length} × ${esc(x.reps)}. Tap untuk lihat form</div></div></button>
      <div class="setrow small muted"><span>Set</span><span style="text-align:center">kg</span><span style="text-align:center">reps</span><span></span></div>
      ${x.sets.map((s,si)=>`<div class="setrow"><b class="num" style="text-align:center">${si+1}</b><input type="number" inputmode="decimal" data-w="${ei}.${si}" value="${s.w}" placeholder="0" aria-label="Beban set ${si+1}"><input type="number" inputmode="numeric" data-r="${ei}.${si}" value="${s.r}" placeholder="0" aria-label="Reps set ${si+1}"><button class="chk ${s.done?"on":""}" data-c="${ei}.${si}" aria-label="Selesai set ${si+1}">✓</button></div>`).join("")}
      <button class="addline" data-addset="${ei}">+ Tambah set</button></div>`}).join("")}</div>
@@ -652,7 +680,7 @@ function openEx(id,back){
   const e=EXM[id];
   const q=encodeURIComponent("cara "+e.n+" yang benar");
   const body=`<div class="demo" id="demo">${e.im.map((s,i)=>`<img src="${s}" alt="${esc(e.n)} ${i?"posisi akhir":"posisi awal"}" style="opacity:${i?0:1}">`).join("")}
-   <span class="cap" id="dcap">1 · Posisi awal</span><div class="ctl"><button id="dplay">Jeda</button></div></div>
+   <span class="cap" id="dcap">Posisi awal</span><div class="ctl"><button id="dplay">Jeda</button></div></div>
    <div class="row" style="flex-wrap:wrap;gap:6px;margin:12px 0"><span class="tag">${esc(LV[e.lv]||e.lv)}</span><span class="tag">${esc(EQ[e.eq]||e.eq)}</span></div>
    <div class="grid2" style="margin-bottom:12px"><div><div class="lbl">Otot utama</div><div style="font-weight:600">${e.pm.map(m=>MUS[m]||m).join(", ")}</div></div>
    <div><div class="lbl">Otot pendukung</div><div>${e.sm.length?e.sm.map(m=>MUS[m]||m).join(", "):"–"}</div></div></div>
@@ -662,7 +690,7 @@ function openEx(id,back){
    ${back?`<button class="btn block" id="bk" style="margin-top:10px">Kembali ke sesi</button>`:""}`;
   sheet(e.n,body,(sh,close)=>{
     const imgs=sh.querySelectorAll("#demo img"),cap=$("#dcap",sh);let i=0,play=true;
-    const show=()=>{imgs.forEach((im,j)=>im.style.opacity=j===i?1:0);cap.textContent=i?"2 · Posisi akhir":"1 · Posisi awal"};
+    const show=()=>{imgs.forEach((im,j)=>im.style.opacity=j===i?1:0);cap.textContent=i?"Posisi akhir":"Posisi awal"};
     const go=()=>{stopDemo();if(imgs.length>1&&play&&!matchMedia("(prefers-reduced-motion: reduce)").matches)demoT=setInterval(()=>{i=1-i;show()},1300)};
     go();$("#dplay",sh).onclick=()=>{play=!play;$("#dplay",sh).textContent=play?"Jeda":"Putar";go()};
     $("#demo",sh).onclick=ev=>{if(ev.target.closest("button"))return;if(imgs.length>1){i=1-i;show()}};
@@ -683,7 +711,7 @@ function vLib(){
   <p class="small muted">Gambar & instruksi: free-exercise-db (lisensi Unlicense / domain publik).</p></div>`;
   const draw=()=>{const q=libF.q.toLowerCase();const ms=libF.m?libF.m.split("|"):null;
     const arr=EX.filter(e=>(!q||e.n.toLowerCase().includes(q))&&(!libF.eq||e.eq===libF.eq)&&(!ms||(libF.m==="cardio"?e.cat==="cardio"||e.cat==="plyometrics":e.pm.some(m=>ms.includes(m)))));
-    $("#ll").innerHTML=arr.length?arr.map(e=>`<button class="exrow" data-ex="${e.id}"><img class="thumb" loading="lazy" src="${e.im[0]}" alt=""><div class="nm"><div>${esc(e.n)}</div><div class="small muted">${e.pm.map(m=>MUS[m]||m).join(", ")} · ${esc(EQ[e.eq]||e.eq)}</div></div></button>`).join("")
+    $("#ll").innerHTML=arr.length?arr.map(e=>`<button class="exrow" data-ex="${e.id}"><img class="thumb" loading="lazy" src="${e.im[0]}" alt=""><div class="nm"><div>${esc(e.n)}</div><div class="small muted">${e.pm.map(m=>MUS[m]||m).join(", ")}, ${esc(EQ[e.eq]||e.eq).toLowerCase()}</div></div></button>`).join("")
       :`<div class="empty">Nggak ada gerakan yang cocok. Coba hapus filter.</div>`;
     $("#ll").querySelectorAll("[data-ex]").forEach(b=>b.onclick=()=>openEx(b.dataset.ex))};
   draw();
@@ -728,12 +756,12 @@ function vStats(){
     ${wsvg||`<div class="empty small">Catat berat minimal 2 hari untuk melihat grafik.</div>`}
     <div class="row"><input type="number" id="wkg" inputmode="decimal" placeholder="Berat hari ini (kg)" value="${last&&last.date===dkey(new Date())?last.kg:""}"><button class="btn" id="wsv">Catat</button></div>
     <div class="small muted">Timbang pagi setelah bangun & ke toilet biar konsisten.</div></div>
-   <div class="card"><h3 style="margin-bottom:6px">Riwayat latihan</h3>${wk.length?wk.map(x=>`<div class="item"><div class="nm"><div>${esc(x.dayName)}</div><div class="small muted">${x.date} · ${esc(x.progName)} · ${x.min} mnt</div></div><div class="small num" style="text-align:right"><b>${x.done} set</b><div class="muted">${r0(x.vol)} kg</div></div></div>`).join(""):`<div class="empty small">Belum ada sesi. Mulai dari tab Program.</div>`}</div>
+   <div class="card"><h3 style="margin-bottom:6px">Riwayat latihan</h3>${wk.length?wk.map(x=>`<div class="item"><div class="nm"><div>${esc(x.dayName)}</div><div class="small muted">${new Date(x.date).toLocaleDateString("id-ID",{day:"numeric",month:"short"})}, ${esc(x.progName)}, ${x.min} mnt</div></div><div class="small num" style="text-align:right"><b>${x.done} set</b><div class="muted">${r0(x.vol)} kg</div></div></div>`).join(""):`<div class="empty small">Belum ada sesi. Mulai dari tab Program.</div>`}</div>
    ${IN_CLAUDE?"":`<div class="card stack"><div class="meal-h" style="margin:0"><h3>AI foto makanan (Gemini)</h3>${gemReady()?'<span class="tag">aktif</span>':""}</div>
     <div class="small muted">Tempel API key Gemini kamu supaya bisa hitung kalori dari foto. Ambil key gratis di <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> (login akun Google → Create API key → salin).</div>
     <input type="text" id="gkey" placeholder="Tempel API key di sini" value="${esc(S.gemini&&S.gemini.key||"")}" autocomplete="off" spellcheck="false">
     <div class="grid2"><button class="btn ghost" id="gdel" ${S.gemini?"":"disabled"}>Hapus key</button><button class="btn" id="gsave">Simpan & tes</button></div>
-    ${gemReady()&&S.gemini.models&&S.gemini.models.length?`<label class="field"><span>Model utama</span><select id="gmodel">${[...new Set([S.gemini.model,...S.gemini.models])].map(m=>`<option value="${esc(m)}" ${m===S.gemini.model?"selected":""}>${esc(m)}${/lite/.test(m)?" · lebih cepat & ringan":/preview/.test(m)?" · preview":" · lebih akurat"}</option>`).join("")}</select></label>`:""}
+    ${gemReady()&&S.gemini.models&&S.gemini.models.length?`<label class="field"><span>Model utama</span><select id="gmodel">${[...new Set([S.gemini.model,...S.gemini.models])].map(m=>`<option value="${esc(m)}" ${m===S.gemini.model?"selected":""}>${esc(m)}${/lite/.test(m)?" (lebih cepat & ringan)":/preview/.test(m)?" (preview)":" (lebih akurat)"}</option>`).join("")}</select></label>`:""}
     <div class="small muted" id="gstat">${gemReady()?"Kalau model utama penuh atau lambat, aplikasi otomatis coba "+(/lite/.test(S.gemini.model)?"model Flash":"Flash-Lite")+".":"Belum diatur."} Key hanya disimpan di HP ini dan tidak ikut di kode backup.</div></div>`}
    <div class="card stack"><h3>Backup data</h3><div class="small muted">Data tersimpan di HP ini saja. Salin kode backup dan simpan (mis. di catatan/WhatsApp ke diri sendiri) supaya bisa dipulihkan.</div>
     <div class="grid2"><button class="btn ghost" id="bexp">Salin backup</button><button class="btn ghost" id="bimp">Pulihkan</button></div>

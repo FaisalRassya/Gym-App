@@ -54,5 +54,5 @@ cd android && ./gradlew assembleDebug
 ## Kredit
 
 - Gambar & instruksi latihan: [free-exercise-db](https://github.com/yuhonas/free-exercise-db) (Unlicense / domain publik)
-- Font: Figtree & Bricolage Grotesque (SIL Open Font License) via [Fontsource](https://fontsource.org)
+- Font: Archivo (SIL Open Font License) via [Fontsource](https://fontsource.org)
 - Nilai gizi adalah estimasi dari rujukan umum (TKPI/USDA) dan bisa berbeda tergantung resep & merek.
