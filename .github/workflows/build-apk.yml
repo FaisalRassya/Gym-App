@@ -22,32 +22,22 @@ jobs:
         run: |
           echo "ANDROID_HOME=$ANDROID_HOME"
           ls "$ANDROID_HOME/platforms" "$ANDROID_HOME/build-tools" | tail -20
-      - name: Siapkan kunci tanda tangan dari Secrets
-        if: github.event_name != 'pull_request'
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-        run: |
-          if [ -z "$KEYSTORE_BASE64" ]; then
-            echo "::error::Secret KEYSTORE_BASE64 belum diisi. Buka Settings > Secrets and variables > Actions, isi KEYSTORE_BASE64 dan KEYSTORE_PASSWORD, lalu jalankan ulang workflow ini."
-            exit 1
-          fi
-          # Buang spasi/enter yang sering ikut waktu copy-paste
-          CLEAN=$(printf "%s" "$KEYSTORE_BASE64" | tr -d ' \r\n\t"')
-          echo "Panjang KEYSTORE_BASE64 setelah dibersihkan: ${#CLEAN} karakter (seharusnya 5712)"
-          if ! printf "%s" "$CLEAN" | base64 -d > android/app/gizigym-release.jks 2>/dev/null; then
-            echo "::error::KEYSTORE_BASE64 bukan base64 yang utuh (panjang ${#CLEAN}, seharusnya 5712). Kemungkinan kepotong atau ada karakter lain ikut tersalin. Hapus secret-nya lalu tempel ulang dari awal sampai akhir."
-            exit 1
-          fi
-      - name: Cek password cocok dengan kunci
+      - name: Buka kunci tanda tangan (terenkripsi di repo, dibuka pakai secret KEYSTORE_PASSWORD)
         if: github.event_name != 'pull_request'
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: |
-          if ! keytool -list -keystore android/app/gizigym-release.jks -storepass "$KEYSTORE_PASSWORD" -alias gizigym >/dev/null 2>&1; then
-            echo "::error::Kunci terbaca, tapi KEYSTORE_PASSWORD tidak cocok (atau kuncinya rusak). Cek ulang secret KEYSTORE_PASSWORD tanpa spasi di awal/akhir."
+          PW=$(printf "%s" "$KEYSTORE_PASSWORD" | tr -d ' \r\n\t"')
+          if [ -z "$PW" ]; then
+            echo "::error::Secret KEYSTORE_PASSWORD belum diisi (Settings > Secrets and variables > Actions)."
             exit 1
           fi
-          echo "Kunci & password cocok."
+          if ! openssl enc -d -aes-256-cbc -pbkdf2 -iter 300000 -in android/app/gizigym-release.jks.enc -out android/app/gizigym-release.jks -pass "pass:$PW" 2>/dev/null \
+             || ! keytool -list -keystore android/app/gizigym-release.jks -storepass "$PW" -alias gizigym >/dev/null 2>&1; then
+            echo "::error::KEYSTORE_PASSWORD salah (panjang ${#PW} karakter, seharusnya 32). Hapus secret-nya lalu tempel ulang persis."
+            exit 1
+          fi
+          echo "Kunci berhasil dibuka."
       - name: Build APK
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}

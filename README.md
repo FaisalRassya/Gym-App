@@ -33,12 +33,13 @@ Versi baru bisa langsung di-install di atas versi lama, data tetap aman.
 
 Setiap push ke `main` otomatis membangun APK bertanda tangan di GitHub Actions dan memasangnya di Releases. Nomor versi = nomor run Actions.
 
-Kunci tanda tangan **tidak** disimpan di repo. Workflow membacanya dari dua repository secret:
+Kunci tanda tangan disimpan **terenkripsi** (AES-256) di `android/app/gizigym-release.jks.enc`. Workflow membukanya pakai satu repository secret:
 
 | Secret | Isi |
 | --- | --- |
-| `KEYSTORE_BASE64` | File keystore `.jks` yang di-encode base64 |
-| `KEYSTORE_PASSWORD` | Password keystore (alias `gizigym`) |
+| `KEYSTORE_PASSWORD` | Password kunci (alias `gizigym`) |
+
+Tanpa password itu, file terenkripsi tidak bisa dipakai untuk menandatangani APK.
 
 Pull request tetap di-build (debug, tanpa tanda tangan) untuk memastikan kodenya jalan.
 

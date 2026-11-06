@@ -17,10 +17,10 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
-    // Kunci tanda tangan TIDAK disimpan di repo. GitHub Actions menulisnya dari secret
-    // KEYSTORE_BASE64 ke file ini, dan password dibaca dari secret KEYSTORE_PASSWORD.
+    // Kunci tanda tangan disimpan TERENKRIPSI (gizigym-release.jks.enc, AES-256).
+    // GitHub Actions membukanya jadi gizigym-release.jks pakai secret KEYSTORE_PASSWORD.
     def ksFile = file("gizigym-release.jks")
-    def ksPass = System.getenv("KEYSTORE_PASSWORD")
+    def ksPass = System.getenv("KEYSTORE_PASSWORD")?.trim()
     signingConfigs {
         release {
             if (ksFile.exists() && ksPass) {
